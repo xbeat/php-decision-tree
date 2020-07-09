@@ -40,11 +40,11 @@ class Decision_Tree{
 		$this->base_value 	= $base_value;
 		$this->false_value 	= $false_value;
 
-		// 2値変数に変換
+		// Convert to binary variable
 		$this->bv_data = Decision_Tree::make_binary_variable_data($this->data,$base_key);
 
 
-		// Decision_Treeの生成 
+		// Generation of Decision_Tree
 		$tree = Decision_Tree::make_decision_tree($this->bv_data,
 												  $this->base_key,
 												  $this->base_value,
@@ -67,7 +67,7 @@ class Decision_Tree{
 		$delta_I_array 	= array();
 
 
-		// dataをコピー
+		// copy data
 		$data = $ori_data;
 
 

@@ -1,34 +1,12 @@
 
-[Software name] Decision tree creation module
-[Copyright holder] Tatsuya Kano
-[Production date] 2011/11/18
-[By type] Decision tree, CART
-[Contact] kokuban.kumasan@gmail.com
-[Operating environment] CentOS 6
-[Development environment] CentOS 6
+Decision tree creation module
+Decision tree, CART
 
-―――――――――――――――――――――――――――――――――――――
-≪Copyright and disclaimer≫
-
-
-―――――――――――――――――――――――――――――――――――――
-
-[Introduction]
 This module creates a decision tree using the CART algorithm,
 This is a module for use.
 
-
-[Installation method]
-As follows.
-
-・Php-decision-tree
-$ git clone git://github.com/kokukuma/php-decision-tree.git
-
-
-[Usage example]
 1, module loading
 require_once('Make_Decision_Tree.php');
-
 
 2, data preparation
 $data = array();

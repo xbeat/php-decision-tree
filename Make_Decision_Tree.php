@@ -4,7 +4,7 @@ require_once('Listing_Combination.php');
 require_once('Handling_Array.php');
 require_once('CART.php');
 
-//nodeのデータ構造 
+//data structure of node
 class DT_Data{
 	var $number;
 	var $match;
@@ -14,7 +14,7 @@ class DT_Data{
 	var $split_value;
 }
 
-//nodeを構成するデータ構造
+//Data structure that constitutes node
 class DT_Node{
 	var $dtdata;
 	var $left;
@@ -71,22 +71,22 @@ class Decision_Tree{
 		$data = $ori_data;
 
 
-		// 各変数の種類を確認 (3種類以上ある変数はどれか)	
+		// Check the type of each variable (which variable has three or more types)
 		$keys = array_keys($data[0]); 
 		foreach ($keys as $k => $key) {
-			// 目的変数は対象外 
+			// Excludes target variables
 			if ($key == $base_key) {
 				continue;
 			}
 
-			// 「連続変数」と「多値変数」の判断
+			// Judgment of "continuous variable" and "multivalued variable"
 			$feat_array = Handling_Array::make_feat_array($data,$key);
 			if(count($feat_array)>=3){
 				if(is_numeric($feat_array[0])){
-					// 値の種類を取出し、3つ以上あり値が数値なら「連続変数」
+					// Extracts the type of value, and if there are three or more values, the value is a "continuous variable"
 					array_push($continuous_param,$key);
 				}else {
-					// 値が数値でなければ「多値変数」と判断する.
+					// If the value is not a numerical value, it is judged as ``multivalued variable''.
 					array_push($multiple_param,$key);
 				}
 			}
@@ -94,13 +94,13 @@ class Decision_Tree{
 
 
 
-		// 2値変数へ圧縮
+		// Compress to binary variable
 		foreach ($multiple_param as $key => $pred) {
-			// 指定した多値変数を2値変数に圧縮する
+			// Compress specified multi-valued variable into binary variable
 			$data = Decision_Tree::multiple_to_binary($data,$base_key,$pred);
 		}
 		foreach ($continuous_param as $key => $pred) {
-			// 指定した連続変数を2値変数に圧縮する
+			// Compress specified continuous variables into binary variables
 			$data = Decision_Tree::continuous_to_binary($data,$base_key,$pred);
 		}
 
@@ -109,33 +109,33 @@ class Decision_Tree{
 	private function continuous_to_binary($data,$base_key,$pred)
 	{
 
-		// カテゴリ変数の種類を抽出
+		// Extract categorical variable type
 		$feat_array = Handling_Array::make_feat_array($data,$pred);
 
-		// 昇順に並べ替える
+		// Sort in ascending order
 		asort($feat_array);
 
 
-		// グループ分けして, delta_Iを計算する
+		// Group and calculate delta_I
 		for ($i=1; $i < count($feat_array); $i++) { 
 
-			// groupを作成 
+			// group Create 
 			$combs[$i] = array_slice($feat_array,0,$i); 
 
-			// 2値変数に圧縮
+			// Compress to binary variable
 			$tmpdata = Decision_Tree::to_binary_data($data,$pred,$combs[$i],'type1','type2');
 
-			// delta_Iを計算
+			// Calculate delta_I
 			$delta_I_array[$i] = CART::calc_delta_I($tmpdata,$base_key,$pred);
 
 		}
 
-		// delta_Iが最大になるグループのキーを調べる 
+		// delta_I Find the key of the group that maximizes
 		$maxdikeys = array_keys($delta_I_array,max($delta_I_array));
 		$maxdikey  = $maxdikeys[0];
 
 
-		// type1 , type2 の名前を設定
+		// Set the name of type1 , type2
 		$type1_name = "";
 		$type2_name = "";
 		$groupmax = max($combs[$maxdikey]);
@@ -145,7 +145,7 @@ class Decision_Tree{
 
 
 
-		// 名前を変更したdataを作成する。
+		// Create renamed data.
 		foreach ($data as $num => $array) {
 			$chk = $array[$pred];
 			if(in_array($chk,$combs[$maxdikey])){
@@ -164,30 +164,30 @@ class Decision_Tree{
 	private function multiple_to_binary($data,$base,$pred)
 	{
 
-		// カテゴリ変数の種類を抽出
+		// Extract categorical variable type
 		$feat_array = Handling_Array::make_feat_array($data,$pred);
 
-		// 組み合わせを抽出
+		// Extract combinations
 		//$combs = split_data($feat_array);
 		$combs = Listing_Combination::list_comb($feat_array);
 
 
-		// グループ分けして、各グループのdelta_Iを計算する
+		// Divide into groups and calculate delta_I for each group
 		foreach ($combs as $combkey => $comb) {
-			// 2値変数に圧縮した配列を作成 
+			// Create a compressed array into a binary variable
 			$tmpdata = Decision_Tree::to_binary_data($data,$pred,$comb,'type1','type2');
 
-			// delta_Iを計算
+			// Calculate delta_I
 			$delta_I_array[$combkey] = CART::calc_delta_I($tmpdata,$base,$pred);
 		}
 
 
-		// delta_Iが最大になるグループのキーを調べる 
+		// Find the key of the group with the highest delta_I
 		$maxdikeys = array_keys($delta_I_array,max($delta_I_array));
 		$maxdikey  = $maxdikeys[0];
 
 
-		// type1 , type2 の名前を設定
+		// Set the name of type1 , type2
 		$type1_name = "";
 		$type2_name = "";
 		foreach ($feat_array as $key => $value) {
@@ -198,7 +198,7 @@ class Decision_Tree{
 			}
 		}
 
-		// 名前を変更したdataを作成する。
+		// Create renamed data.
 		$tmpdata = Decision_Tree::to_binary_data($data,$pred,$combs[$maxdikey],$type1_name,$type2_name);
 
 
@@ -207,7 +207,7 @@ class Decision_Tree{
 
 	private function to_binary_data($data,$pred,$comb,$name1,$name2) 
 	{
-		// 2値変数に圧縮した配列を作成 
+		// Create a compressed array into a binary variable
 		foreach ($data as $num => $array) {
 			$chk = $array[$pred];
 			if(in_array($chk,$comb)){
@@ -225,9 +225,9 @@ class Decision_Tree{
 
 	public function exe_prognosis($tree,$target){
 
-		// 終端ノードなら、そのノードにおける目的変数の値を返す 
+		// If it is a terminal node, returns the value of the objective variable at that node
 		if($tree->terminal){
-			// 目的変数値の種類ごとの数を確認
+			// Check the number of target variable values for each type
 			$true_num  = $tree->dtdata->match;
 			$false_num = $tree->dtdata->unmatch;
 
@@ -241,7 +241,7 @@ class Decision_Tree{
 				echo $pars."\n";
 				return $this->false_value;
 			}
-		// 終端ノードでなければ、分岐条件を確認する
+		// If it is not the end node, check the branch condition
 		}else {
 			$split_key = $tree->left->dtdata->split_key;
 			$lval 	   = $tree->left->dtdata->split_value;
@@ -249,7 +249,7 @@ class Decision_Tree{
 		}
 
 		
-		// 連続変数かどうかを確認する
+		// Check if continuous variable
 		$feat_array = Handling_Array::make_feat_array($this->data,$split_key);
 		if(count($feat_array)>3  && is_numeric($feat_array[0])){
 			if(!(strstr('<=x',$lval)==false)){
@@ -263,10 +263,10 @@ class Decision_Tree{
 			$flg = 0;
 		}
 
-		// 分岐条件に従い、次のノードの計算を行う。 
+		// The next node is calculated according to the branch condition.
 		switch ($flg) {
 		case 0:
-			// カテゴリ変数が元連続変数でない場合の分岐方法 
+			// Branching method when categorical variables are not original continuous variables
 			if(!(strstr($lval,$target[$split_key])==false))
 			{
 				return Decision_Tree::exe_prognosis($tree->left,$target);
@@ -277,7 +277,7 @@ class Decision_Tree{
 			}
 			break;
 		case 1:
-			// カテゴリ変数が元連続変数である場合の分岐方法
+			// Branching method when categorical variable is original continuous variable
 			if($border >= $target[$split_key]){
 				return Decision_Tree::exe_prognosis($tree->right,$target);
 			}else{
@@ -285,7 +285,7 @@ class Decision_Tree{
 			}
 			break;
 		case 2:
-			// カテゴリ変数が元連続変数である場合の分岐方法2
+			// Branching method 2 when categorical variable is original continuous variable
 			if($border >= $target[$split_key]){
 				return Decision_Tree::exe_prognosis($tree->left,$target);
 			}else{
@@ -303,7 +303,7 @@ class Decision_Tree{
 		$dtnode = new DT_Node();
 		$dtdata = new DT_Data();
 
-		// dtdataをセット 
+		// set dtdata
 		$dtdata = Decision_Tree::set_DtData($data,$base,$base_value);
 		$dtdata->split_key   = $split_key;
 		$dtdata->split_value = $split_value;
@@ -312,19 +312,19 @@ class Decision_Tree{
 
 
 
-		// カテゴリ変数ごとにdelta_Iを計算する 
+		// Calculate delta_I for each categorical variable
 		$keys = array_keys($data[0]); 
 		foreach ($keys as $k => $key) {
 			if ($key == $base) {
 				continue;
 			}
-			// delta_Iを計算
+			// delta_I Calculate
 			$delta_I_array[$key] = CART::calc_delta_I($data,$base,$key);
 		}
 		
 
-		// delta_Iが全部ゼロなら終了
-		// この辺の終了条件はかなり適当
+		// End if delta_I is all zero
+		// The termination conditions around here are quite appropriate
 		$flg =0;
 		foreach ($delta_I_array as $key => $value) {
 			if($value != 0.0){$flg=1;}
@@ -335,10 +335,10 @@ class Decision_Tree{
 		}
 
 
-		// 最大のdelta_Iを抽出
+		// Extract maximum delta_I
 		$split_key = array_keys($delta_I_array,max($delta_I_array));
 
-		// delta_Iが最大となるカテゴリ変数でdataを分割する
+		// Divide data by the categorical variable that maximizes delta_I
 		$split_array = Handling_Array::split_by_pred($data,$split_key[0]);
 		$i = 0;
 		foreach ($split_array as $key => $value) {
@@ -356,17 +356,17 @@ class Decision_Tree{
 		}
 
 
-		// 決まったら、DT_Nodeを返却
+		// When decided, return DT_Node
 		return $dtnode;
 
 	}
 	private function set_DtData($data,$base,$value)
 	{
-		// カテゴリ変数の抽出
+		// Categorical variable extraction
 		$split_array = Handling_Array::split_by_pred($data,$base);
 
 
-		// DT_Dataを作成
+		// Create DT_Data
 		$dtdata = new DT_Data();
 		$dtdata->number = count($data);
 		if(isset($split_array[$value])){

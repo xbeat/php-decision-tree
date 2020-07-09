@@ -1,7 +1,7 @@
 <?php
 class Handling_Array{
 
-	// カテゴリ変数に含まれる値を返す 
+	// Returns the value contained in a categorical variable
 	public function make_feat_array($data,$pred)
 	{
 		$feat_array = array();
@@ -21,16 +21,16 @@ class Handling_Array{
 		
 	}
 
-	// 指定したカテゴリ変数で$dataを分割する。
+	// Split $data by the specified categorical variable.
 	//public function fbv($data,$pred)
 	public function split_by_pred($data,$pred)
 	{
 		$split_array = array();
 
-		// data 配列を予測変数の種類ごとに抽出する.
+		// data Extract the array for each predictor type.
 		$feat_array = Handling_Array::make_feat_array($data,$pred);
 		
-		// 予測変数の値毎の出現確率を計算
+		// Calculate probability of occurrence for each value of predictor
 		foreach ($feat_array as $value) {
 
 			$i = 0;

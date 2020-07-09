@@ -8,12 +8,12 @@ class CART{
 		$split_array = array();
 		$gini_array  = array();
 
-		// data 配列を予測変数の種類ごとに分割する.
+		// data Split the array by predictor type.
 		$split_array = Handling_Array::split_by_pred($data,$pred);
 		//var_dump($split_array);
 
 
-		// 各配列のジニ係数を計算する　	
+		// Compute the Gini coefficient for each array	
 		foreach ($split_array as $key => $value) {
 			//var_dump($value);
 			$gini_array[$key] = CART::calc_gini_index($value,$base);
@@ -21,7 +21,7 @@ class CART{
 		//var_dump($gini_array);
 		$gini_root = CART::calc_gini_index($data,$base);
 
-		// delta-Iを計算
+		// Calculate delta-I
 		$delta_I = $gini_root; 
 
 		foreach ($split_array as $key => $value) {
@@ -42,18 +42,18 @@ class CART{
 		$odds = array();
 
 
-		// 予測変数の値毎の個体数を抽出
+		// Extract the number of individuals for each predictor value
 		$feat_array = Handling_Array::make_feat_array($data,$base);
 
 
-		// 予測変数の値毎の出現確率を計算
+		// Calculate probability of occurrence for each value of predictor
 		foreach ($feat_array as $key => $value) {
 			$odd = CART::probability_calculation($data,$base,$value);
 			array_push($odds , $odd);
 		}	
 
 
-		// Gini係数を計算
+		// Calculate Gini coefficient
 		$gini = 1;
 		foreach ($odds as $key => $value) {
 			$gini -= pow($value,2); 

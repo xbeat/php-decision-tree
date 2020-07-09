@@ -16,7 +16,7 @@ class Listing_Combination
 		$result = array(); 
 		$return = array(); 
 
-		// 組み合わせを抽出 
+		// Extract combinations
 		for ($i=0; $i < count($data)-1; $i++) { 
 			$res = Listing_Combination::calc_combination($data , $i+1);
 			foreach ($res as $key => $value) {
@@ -24,7 +24,7 @@ class Listing_Combination
 			}
 		}
 
-		// 重複を排除
+		// Eliminate duplicates
 		$length = floor( count($data) / 2);
 		$flg    = count($data) % 2; 
 
